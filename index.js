@@ -1,14 +1,18 @@
+//Constants
 const API =
-  "https://fsa-crud-2aa9294fe819.herokuapp.com/api/2506-FTB-ET-WEB-FT-A-ash/events";
+  "https://fsa-crud-2aa9294fe819.herokuapp.com/api/2506-FTB-ET-WEB-FT-A-ash";
 
+///2506-FTB-ET-WEB-FT-A-ash/events
+//state
 let events = [];
-let selectedEvent = null;
+let selectedEvent;
 
+//all events
 async function getEvents() {
   try {
     const response = await fetch(`${API}/events`);
     const result = await response.json();
-    artists = result.data;
+    events = result.data;
     render();
   } catch (error) {
     console.error(error);
@@ -16,11 +20,12 @@ async function getEvents() {
   render();
 }
 
+//selectedevent
 async function getEvent(id) {
   try {
     const response = await fetch(`${API}/events/${id}`);
     const result = await response.json();
-    selectedArtist = result.data;
+    selectedEvent = result.data;
     render();
   } catch (error) {
     console.error(error);
@@ -37,41 +42,42 @@ function eventListItem(event) {
   $li.innerHTML = `
     <a href="#selected">${event.name}</a>
   `;
-  $li.addEventListener("click", () => getEvent(event.id));
+  $li.addEventListener("click", (e) => {
+    getEvent(event.id);
+    e.preventDefault();
+  });
   return $li;
 }
 
-function PartyList() {
+function EventList() {
   const $ul = document.createElement("ul");
-  $ul.classList.add("parties");
+  $ul.classList.add("events");
 
-  const $parties = parties.map(PartyListItem);
-  $ul.replaceChildren(...$parties);
+  const $events = events.map(eventListItem);
+  $ul.replaceChildren(...$events);
 
   return $ul;
 }
 
 /** Detailed information about the selected party */
-function SelectedParty() {
-  if (!selectedParty) {
+function SelectedEvent() {
+  if (!selectedEvent) {
     const $p = document.createElement("p");
     $p.textContent = "Please select a party to learn more.";
     return $p;
   }
 
-  const $party = document.createElement("section");
-  $party.innerHTML = `
-    <h3>${selectedParty.name} #${selectedParty.id}</h3>
-    <time datetime="${selectedParty.date}">
-      ${selectedParty.date.slice(0, 10)}
+  const $event = document.createElement("section");
+  $event.innerHTML = `
+    <h3>${selectedEvent.name} #${selectedEvent.id}</h3>
+    <time datetime="${selectedEvent.date}">
+      ${selectedEvent.date.slice(0, 10)}
     </time>
-    <address>${selectedParty.location}</address>
-    <p>${selectedParty.description}</p>
-    <GuestList></GuestList>
+    <address>${selectedEvent.location}</address>
+    <p>${selectedEvent.description}</p>
   `;
-  $party.querySelector("GuestList").replaceWith(GuestList());
 
-  return $party;
+  return $event;
 }
 // === Render ===
 function render() {
@@ -81,17 +87,17 @@ function render() {
     <main>
       <section>
         <h2>Upcoming Parties</h2>
-        <PartyList></PartyList>
+        <EventList></EventList>
       </section>
       <section id="selected">
         <h2>Party Details</h2>
-        <SelectedParty></SelectedParty>
+        <SelectedEvent></SelectedEvent>
       </section>
     </main>
   `;
 
-  $app.querySelector("eventList").replaceWith(PartyList());
-  $app.querySelector("selectedEvent").replaceWith(SelectedParty());
+  $app.querySelector("EventList").replaceWith(EventList());
+  $app.querySelector("SelectedEvent").replaceWith(SelectedEvent());
 }
 
 async function init() {
